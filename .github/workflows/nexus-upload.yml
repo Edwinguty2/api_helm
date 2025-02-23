@@ -1,0 +1,36 @@
+name: Build and Upload Helm Chart to Nexus
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-upload:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Set up Helm
+        uses: azure/setup-helm@v1
+        with:
+          version: 'v3.10.3'
+
+      - name: Package Helm chart
+        run: |
+          helm package myapihelm
+          ls -l *.tgz
+
+      - name: Upload chart to Nexus
+        env:
+          NEXUS_URL: ${{ secrets.NEXUS_URL }}
+          NEXUS_USERNAME: ${{ secrets.NEXUS_USERNAME }}
+          NEXUS_PASSWORD: ${{ secrets.NEXUS_PASSWORD }}
+        run: |
+          # Obtener el nombre del archivo .tgz generado (por ejemplo, myapihelm-0.1.0.tgz)
+          CHART_FILE=$(ls -1 *.tgz)
+          echo "Uploading $CHART_FILE to Nexus at ${NEXUS_URL}"
+          # Usa curl para subir el archivo; la URL final debe incluir el nombre del archivo
+          curl -v -u "${NEXUS_USERNAME}:${NEXUS_PASSWORD}" --upload-file "$CHART_FILE" "${NEXUS_URL}${CHART_FILE}"
