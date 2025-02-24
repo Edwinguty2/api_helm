@@ -33,7 +33,7 @@ jobs:
           NEXUS_PASSWORD: ${{ secrets.NEXUS_PASSWORD }}
         run: |
           # Obtener el nombre del archivo .tgz generado (ejemplo: myapihelm-0.1.0.tgz)
-          CHART_FILE=$(ls -1 *.tgz)
+          CHART_FILE=$(ls -t *.tgz | head -n1)
           echo "Uploading $CHART_FILE to Nexus at ${NEXUS_URL}"
           # Subir el chart a Nexus; la URL final debe incluir el nombre del archivo
           curl -v -u "${NEXUS_USERNAME}:${NEXUS_PASSWORD}" --upload-file "$CHART_FILE" "${NEXUS_URL}${CHART_FILE}"
