@@ -16,31 +16,7 @@ jobs:
       - name: Set up Helm
         uses: azure/setup-helm@v1
         with:
-          version: 'v3.10.3'
-
-      - name: Obtener última versión del backend
-        id: get_version
-        run: |
-          # Consultar la API de Docker Hub y obtener los tags (excluyendo "latest")
-          echo "Consultando Docker Hub para obtener tags..."
-          TAGS=$(curl -s "https://hub.docker.com/v2/repositories/nicolasortiz05/back-taller/tags?page_size=100" | jq -r '.results[].name' | grep -v '^latest$')
-          echo "Tags encontrados:"
-          echo "$TAGS"
-          
-          # Ordenar los tags en orden semántico y tomar el último
-          NUEVA_VERSION=$(echo "$TAGS" | sort -V | tail -n 1)
-          echo "Nueva versión detectada: $NUEVA_VERSION"
-          
-          # Exportar la variable para los siguientes pasos
-          echo "NUEVA_VERSION=$NUEVA_VERSION" >> $GITHUB_ENV
-
-      - name: Actualizar tag en values.yaml
-        run: |
-          echo "Actualizando values.yaml con la versión: ${{ env.NUEVA_VERSION }}"
-          sed -i "s/\(tag:\s*\).*/\1\"${{ env.NUEVA_VERSION }}\"/" myapihelm/values.yaml
-          echo "Contenido actualizado de values.yaml:"
-          cat myapihelm/values.yaml
-          
+          version: 'v3.10.3'        
 
       - name: Package Helm chart
         run: |
