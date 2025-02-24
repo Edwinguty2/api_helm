@@ -32,5 +32,44 @@ jobs:
           # Obtener el nombre del archivo .tgz generado (por ejemplo, myapihelm-0.1.0.tgz)
           CHART_FILE=$(ls -1 *.tgz)
           echo "Uploading $CHART_FILE to Nexus at ${NEXUS_URL}"
-          # Usa curl para subir el archivo; la URL final debe incluir el nombre del archivo
+          # Subir el chart a Nexus; la URL final debe incluir el nombre del archivo
           curl -v -u "${NEXUS_USERNAME}:${NEXUS_PASSWORD}" --upload-file "$CHART_FILE" "${NEXUS_URL}${CHART_FILE}"
+
+      - name: Obtener la última versión del chart desde Nexus
+        id: get_latest_version
+        env:
+          NEXUS_URL: ${{ secrets.NEXUS_URL }}
+          NEXUS_USERNAME: ${{ secrets.NEXUS_USERNAME }}
+          NEXUS_PASSWORD: ${{ secrets.NEXUS_PASSWORD }}
+        run: |
+          echo "Consultando Nexus para obtener la última versión del chart..."
+          # Se asume que Nexus tiene un endpoint de búsqueda que permite filtrar por el nombre del chart.
+          RESPONSE=$(curl -s -u "${NEXUS_USERNAME}:${NEXUS_PASSWORD}" "${NEXUS_URL}/service/rest/v1/search?name=myapihelm")
+          echo "Respuesta de Nexus: $RESPONSE"
+          # Extraer las versiones y seleccionar la más alta (ordenadas numéricamente)
+          VERSION=$(echo "$RESPONSE" | jq -r '.items[].version' | sort -V | tail -n 1)
+          echo "La última versión es: $VERSION"
+          # Exportar la variable para los siguientes pasos
+          echo "NUEVA_VERSION=$VERSION" >> $GITHUB_ENV
+
+      - name: 🔄 Actualizar kustomization.yaml en el repositorio de configuración
+        run: |
+          # Clonar el repositorio de configuración de ArgoCD
+          git clone https://github.com/NicolasOrtiz05/manifiestos_tallerp_1.git
+          cd manifiestos_tallerp_1
+          
+          # Actualizar el newTag en kustomization.yaml con la nueva versión obtenida de Nexus
+          sed -i "s/newTag: .*/newTag: \"${{ env.NUEVA_VERSION }}\"/" kustomization.yaml
+          
+          # Configurar Git para commit
+          git config user.email "github-actions@github.com"
+          git config user.name "GitHub Actions"
+          
+          git add kustomization.yaml
+          git commit -m "🚀 Actualizando imagen a versión ${{ env.NUEVA_VERSION }}"
+          
+          # Configurar la URL con el token correctamente
+          git remote set-url origin https://x-access-token:${{ secrets.PAT_GITHUB }}@github.com/NicolasOrtiz05/manifiestos_tallerp_1.git
+          
+          # Hacer push de los cambios
+          git push origin main
