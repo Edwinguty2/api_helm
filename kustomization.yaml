@@ -1,7 +1,0 @@
-apiVersion: kustomize.config.k8s.io/v1beta1
-kind: Kustomization
-resources:
-  - deployment.yaml
-images:
-  - name: nicolasortiz05/back-taller
-    newTag: "placeholder"  # Este valor se reemplazará por la última versión del chart desde Nexus
