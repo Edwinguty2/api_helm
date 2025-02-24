@@ -55,8 +55,8 @@ jobs:
       - name: 🔄 Actualizar kustomization.yaml en el repositorio de configuración
         run: |
           # Clonar el repositorio de configuración de ArgoCD
-          git clone https://github.com/NicolasOrtiz05/manifiestos_tallerp_1.git
-          cd manifiestos_tallerp_1
+          git clone https://github.com/Edwinguty2/api_helm.git
+          cd api_helm
           
           # Actualizar el newTag en kustomization.yaml con la nueva versión obtenida de Nexus
           sed -i "s/newTag: .*/newTag: \"${{ env.NUEVA_VERSION }}\"/" kustomization.yaml
