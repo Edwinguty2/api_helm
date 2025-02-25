@@ -67,9 +67,6 @@ jobs:
           git commit -m "Actualiza ArgoCD targetRevision a ${{ steps.chart-version.outputs.version }} [skip ci]" || echo "No hay cambios que commitear"
           git push origin main
 
-
-
-
       - name: Autenticar en Digital Ocean
         uses: digitalocean/action-doctl@v2
         with:
@@ -78,9 +75,6 @@ jobs:
       - name: Obtener credenciales de Kubernetes
         run: doctl kubernetes cluster kubeconfig save ${{ secrets.NOMBRE_DEL_CLUSTER }}
 
-
-
-
       - name: Descargar y modificar manifest de ArgoCD de desarrollo
         run: |
           kubectl get application api-chart-dev -n argocd -o yaml > argo-app.yaml
@@ -88,6 +82,10 @@ jobs:
           yq e ".spec.source.targetRevision = \"$VERSION\"" -i argo-app.yaml
           cat argo-app.yaml  # Para verificar el cambio
 
+      - name: Sincronizar aplicación de desarrollo en ArgoCD
+        run: |
+          kubectl patch application api-chart-dev -n argocd --type='merge' -p '{"metadata":
+          {"annotations": {"argocd.argoproj.io/refresh": "hard"}}}'
 
       - name: Descargar y modificar manifest de ArgoCD de producion
         run: |
@@ -96,6 +94,10 @@ jobs:
           yq e ".spec.source.targetRevision = \"$VERSION\"" -i argo-app.yaml
           cat argo-app.yaml  # Para verificar el cambio
 
-
+      - name: Sincronizar aplicación de produccion en ArgoCD
+        run: |
+          kubectl patch application api-chart-prod -n argocd --type='merge' -p '{"metadata":
+          {"annotations": {"argocd.argoproj.io/refresh": "hard"}}}'
+          
       - name: Aplicar nueva configuración en Kubernetes
         run: kubectl apply -f argo-app.yaml
