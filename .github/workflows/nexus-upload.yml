@@ -82,6 +82,10 @@ jobs:
           yq e ".spec.source.targetRevision = \"$VERSION\"" -i argo-app.yaml
           cat argo-app.yaml  # Para verificar el cambio
 
+      
+      - name: Aplicar nueva configuración en Kubernetes desarrllo
+        run: kubectl apply -f argo-app.yaml
+
       - name: Descargar y modificar manifest de ArgoCD de producion
         run: |
           kubectl get application api-chart-prod -n argocd -o yaml > argo-app.yaml
@@ -89,23 +93,5 @@ jobs:
           yq e ".spec.source.targetRevision = \"$VERSION\"" -i argo-app.yaml
           cat argo-app.yaml  # Para verificar el cambio
 
-      - name: Forzar sincronización de ArgoCD
-        run: |
-          kubectl patch application api-chart-dev -n argocd --type='merge' -p '{"metadata": {"annotations": {"argocd.argoproj.io/refresh": "hard"}}}'
-          kubectl patch application api-chart-prod -n argocd --type='merge' -p '{"metadata": {"annotations": {"argocd.argoproj.io/refresh": "hard"}}}'
-
-      - name: Obtener y modificar manifiesto de ArgoCD antes de aplicar cambios
-        run: |
-
-          kubectl get application api-chart-dev -n argocd -o yaml > argo-app.yaml
-          VERSION=${{ steps.chart-version.outputs.version }}
-          yq e ".spec.source.targetRevision = \"$VERSION\"" -i argo-app.yaml
-          cat argo-app.yaml  # Para verificar el cambio
-
-          kubectl get application api-chart-prod -n argocd -o yaml > argo-app.yaml
-          VERSION=${{ steps.chart-version.outputs.version }}
-          yq e ".spec.source.targetRevision = \"$VERSION\"" -i argo-app.yaml
-          cat argo-app.yaml  # Para verificar el cambio
-
-      - name: Aplicar nueva configuración en Kubernetes
+      - name: Aplicar nueva configuración en Kubernetes produccion
         run: kubectl apply -f argo-app.yaml
