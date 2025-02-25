@@ -64,3 +64,26 @@ jobs:
           git status  # Muestra el estado del repo antes del commit
           git commit -m "Actualiza ArgoCD targetRevision a ${{ steps.chart-version.outputs.version }}" || echo "No hay cambios que commitear"
           git push origin main
+
+
+
+
+      - name: Autenticar en Digital Ocean
+        uses: digitalocean/action-doctl@v2
+        with:
+          token: ${{ secrets.DO_ACCESS_TOKEN }}
+
+      - name: Obtener credenciales de Kubernetes
+        run: doctl kubernetes cluster kubeconfig save <NOMBRE_DEL_CLUSTER>
+
+
+
+      - name: Descargar y modificar manifest de ArgoCD
+        run: |
+          kubectl get app <nombre-de-tu-app> -o yaml > argo-app.yaml
+          VERSION=${{ steps.chart-version.outputs.version }}
+          yq e ".spec.source.targetRevision = \"$VERSION\"" -i argo-app.yaml
+          cat argo-app.yaml  # Para verificar el cambio
+
+      - name: Aplicar nueva configuración en Kubernetes
+        run: kubectl apply -f argo-app.yaml
