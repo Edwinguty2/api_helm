@@ -76,7 +76,7 @@ jobs:
           token: ${{ secrets.DO_ACCESS_TOKEN }}
 
       - name: Obtener credenciales de Kubernetes
-        run: doctl kubernetes cluster kubeconfig save ${{ secrets.DO_CLUSTER_NAME }}
+        run: doctl kubernetes cluster kubeconfig save ${{ secrets.NOMBRE_DEL_CLUSTER }}
 
 
 
