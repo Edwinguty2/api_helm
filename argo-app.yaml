@@ -14,6 +14,5 @@ spec:
     namespace: default
   syncPolicy:
     automated:
-      selfHeal: true # Habilita la autocorrección si el estado real no coincide con el deseado
     syncOptions:
       - CreateNamespace=true
