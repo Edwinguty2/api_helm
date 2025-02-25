@@ -41,3 +41,4 @@ spec:
             timeoutSeconds: 10
             periodSeconds: 20
             failureThreshold: 10
+#prueba para ver si cambia la sincronia con esto, hay fe
