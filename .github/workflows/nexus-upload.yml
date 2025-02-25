@@ -60,6 +60,7 @@ jobs:
         run: |
           git config --local user.email "actions@github.com"
           git config --local user.name "GitHub Actions"
-          git add argo-app.yaml
-          git commit -m "Actualiza ArgoCD targetRevision a ${{ steps.chart-version.outputs.version }}"
+          git add -A  # Asegura que se agreguen todos los cambios
+          git status  # Muestra el estado del repo antes del commit
+          git commit -m "Actualiza ArgoCD targetRevision a ${{ steps.chart-version.outputs.version }}" || echo "No hay cambios que commitear"
           git push origin main
