@@ -8,7 +8,7 @@ spec:
   source:
     repoURL: http://167.172.9.84:8081/repository/helm-repo/
     chart: api-chart
-    targetRevision: 0.1.11 # Esta versión se actualizará automáticamente
+    targetRevision: 0.1.12 # Esta versión se actualizará automáticamente
   destination:
     server: https://kubernetes.default.svc
     namespace: default
