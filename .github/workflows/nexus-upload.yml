@@ -81,9 +81,17 @@ jobs:
 
 
 
-      - name: Descargar y modificar manifest de ArgoCD
+      - name: Descargar y modificar manifest de ArgoCD de desarrollo
         run: |
           kubectl get application api-chart-dev -n argocd -o yaml > argo-app.yaml
+          VERSION=${{ steps.chart-version.outputs.version }}
+          yq e ".spec.source.targetRevision = \"$VERSION\"" -i argo-app.yaml
+          cat argo-app.yaml  # Para verificar el cambio
+
+
+      - name: Descargar y modificar manifest de ArgoCD de producion
+        run: |
+          kubectl get application api-chart-prod -n argocd -o yaml > argo-app.yaml
           VERSION=${{ steps.chart-version.outputs.version }}
           yq e ".spec.source.targetRevision = \"$VERSION\"" -i argo-app.yaml
           cat argo-app.yaml  # Para verificar el cambio
