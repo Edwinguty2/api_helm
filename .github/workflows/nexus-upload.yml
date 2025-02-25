@@ -64,7 +64,7 @@ jobs:
           git config --local user.name "GitHub Actions"
           git add -A  # Asegura que se agreguen todos los cambios
           git status  # Muestra el estado del repo antes del commit
-          git commit -m "Actualiza ArgoCD targetRevision a ${{ steps.chart-version.outputs.version }}" || echo "No hay cambios que commitear"
+          git commit -m "Actualiza ArgoCD targetRevision a ${{ steps.chart-version.outputs.version }} [skip ci]" || echo "No hay cambios que commitear"
           git push origin main
 
 
@@ -83,10 +83,11 @@ jobs:
 
       - name: Descargar y modificar manifest de ArgoCD
         run: |
-          kubectl get app api-chart-app -o yaml > argo-app.yaml
+          kubectl get application api-chart-app -n argocd -o yaml > argo-app.yaml
           VERSION=${{ steps.chart-version.outputs.version }}
           yq e ".spec.source.targetRevision = \"$VERSION\"" -i argo-app.yaml
           cat argo-app.yaml  # Para verificar el cambio
+
 
       - name: Aplicar nueva configuración en Kubernetes
         run: kubectl apply -f argo-app.yaml
