@@ -84,8 +84,8 @@ jobs:
 
       - name: Sincronizar aplicación de desarrollo en ArgoCD
         run: |
-          kubectl patch application api-chart-dev -n argocd --type='merge' -p '{"metadata":
-          {"annotations": {"argocd.argoproj.io/refresh": "hard"}}}'
+          kubectl patch application api-chart-dev -n argocd --type='merge' -p '{"metadata": {"annotations": {"argocd.argoproj.io/refresh": "hard"}}}'
+
 
       - name: Descargar y modificar manifest de ArgoCD de producion
         run: |
@@ -96,8 +96,7 @@ jobs:
 
       - name: Sincronizar aplicación de produccion en ArgoCD
         run: |
-          kubectl patch application api-chart-prod -n argocd --type='merge' -p '{"metadata":
-          {"annotations": {"argocd.argoproj.io/refresh": "hard"}}}'
+          kubectl patch application api-chart-prod -n argocd --type='merge' -p '{"metadata": {"annotations": {"argocd.argoproj.io/refresh": "hard"}}}'
           
       - name: Aplicar nueva configuración en Kubernetes
         run: kubectl apply -f argo-app.yaml
