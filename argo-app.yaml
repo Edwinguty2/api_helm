@@ -13,6 +13,7 @@ spec:
     server: https://kubernetes.default.svc
     namespace: default
   syncPolicy:
-    automated: {}
+    automated:
+      selfHeal: true  # Habilita la autocorrección si el estado real no coincide con el deseado
     syncOptions:
       - CreateNamespace=true
